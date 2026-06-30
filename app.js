@@ -151,7 +151,7 @@ function startGame() {
   if (state.config.mode === "tandem") {
     setupTandemPlayers(state.config);
     state.deck = shuffle(
-      concepts.flatMap((concept) => buildTandemCardsForConcept(concept, state.config)),
+      concepts.flatMap((concept, index) => buildTandemCardsForConcept(concept, state.config, index)),
     );
     state.totalPairs = state.deck.length;
   } else {
@@ -288,7 +288,7 @@ function setupTandemPlayers(config) {
   state.currentPlayerIndex = 0;
 }
 
-function buildTandemCardsForConcept(concept, config) {
+function buildTandemCardsForConcept(concept, config, index) {
   const thomasCard = {
     uid: `${concept.id}-thomas-${makeId()}`,
     conceptId: concept.id,
@@ -303,18 +303,21 @@ function buildTandemCardsForConcept(concept, config) {
     goal: "Say Thai",
     frontKind: "English",
     frontLines: [concept.en],
-    frontHelper: concept.de,
+    frontHelper: "",
     backKind: "Thai answer",
     backLines: [concept.thai, concept.thai_romanized],
-    backHelper: "Thomas says Thai",
+    backHelper: `German helper: ${concept.de}`,
   };
 
   if (config.playerCount === 1) {
     return [thomasCard];
   }
 
+  if (index % 2 === 0) {
+    return [thomasCard];
+  }
+
   return [
-    thomasCard,
     {
       uid: `${concept.id}-teacher-${makeId()}`,
       conceptId: concept.id,
@@ -328,11 +331,11 @@ function buildTandemCardsForConcept(concept, config) {
       scoreKey: "teacher",
       goal: "Say English",
       frontKind: "Thai",
-      frontLines: [concept.thai, concept.thai_romanized],
+      frontLines: [concept.thai],
       frontHelper: "",
       backKind: "English answer",
       backLines: [concept.en],
-      backHelper: `German helper: ${concept.de}`,
+      backHelper: `Romanized: ${concept.thai_romanized} / German helper: ${concept.de}`,
     },
   ];
 }
@@ -722,6 +725,7 @@ function renderTandemCard(card, coordinate) {
 }
 
 function renderTandemFace(faceClass, coordinate, emoji, label, lines, helper, owner) {
+  const isFront = faceClass.includes("card-front");
   const lineMarkup = lines
     .map(
       (line, index) =>
@@ -732,11 +736,11 @@ function renderTandemFace(faceClass, coordinate, emoji, label, lines, helper, ow
   return `
     <span class="card-face ${faceClass}">
       <span class="card-coordinate">${escapeHtml(coordinate)}</span>
-      <span class="challenge-owner">${escapeHtml(owner)}</span>
+      ${isFront ? "" : `<span class="challenge-owner">${escapeHtml(owner)}</span>`}
       <span class="card-emoji" aria-hidden="true">${escapeHtml(emoji)}</span>
       <span class="card-lines">${lineMarkup}</span>
-      ${helper ? `<span class="card-helper">${escapeHtml(helper)}</span>` : ""}
-      <span class="card-tag">${escapeHtml(label)}</span>
+      ${!isFront && helper ? `<span class="card-helper">${escapeHtml(helper)}</span>` : ""}
+      ${isFront ? "" : `<span class="card-tag">${escapeHtml(label)}</span>`}
     </span>
   `;
 }
