@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Thai Learning Memory</title>
+    <link rel="stylesheet" href="style.css?v=4" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="app-header">
+        <div>
+          <p class="eyebrow">Language Learning Memory</p>
+          <h1>Thai Memory Match</h1>
+        </div>
+        <button id="restartButton" class="ghost-button" type="button" hidden>
+          New Game
+        </button>
+      </header>
+
+      <main>
+        <section id="statusMessage" class="status-message" role="alert" hidden></section>
+
+        <section id="startScreen" class="start-screen" aria-labelledby="setupTitle">
+          <form id="setupForm" class="setup-panel">
+            <div class="setup-title">
+              <p class="eyebrow">MVP practice deck</p>
+              <h2 id="setupTitle">Choose a memory game</h2>
+            </div>
+
+            <fieldset class="control-group">
+              <legend>Play mode</legend>
+              <div class="segmented-control">
+                <label>
+                  <input type="radio" name="playMode" value="solo" />
+                  <span>Solo Practice</span>
+                </label>
+                <label>
+                  <input type="radio" name="playMode" value="tandem" checked />
+                  <span>Tandem Flip Game</span>
+                </label>
+              </div>
+            </fieldset>
+
+            <div id="soloOptions" class="control-group">
+              <label for="learningDirection">Solo learning direction</label>
+              <select id="learningDirection" name="learningDirection">
+                <option value="de_en_to_thai">German/English -&gt; Thai</option>
+                <option value="en_to_thai">English -&gt; Thai</option>
+                <option value="thai_to_en">Thai -&gt; English</option>
+                <option value="thai_to_de">Thai -&gt; German</option>
+                <option value="de_to_thai">German -&gt; Thai</option>
+              </select>
+            </div>
+
+            <div id="tandemOptions" class="control-group">
+              <fieldset class="control-group">
+                <legend>Number of players</legend>
+                <div class="segmented-control">
+                  <label>
+                    <input type="radio" name="playerCount" value="1" />
+                    <span>1 player</span>
+                  </label>
+                  <label>
+                    <input type="radio" name="playerCount" value="2" checked />
+                    <span>2 players</span>
+                  </label>
+                </div>
+              </fieldset>
+            </div>
+
+            <fieldset class="control-group">
+              <legend>Deck size</legend>
+              <div class="segmented-control compact">
+                <label>
+                  <input type="radio" name="deckSize" value="6" checked />
+                  <span>6 concepts</span>
+                </label>
+                <label>
+                  <input type="radio" name="deckSize" value="10" />
+                  <span>10 concepts</span>
+                </label>
+                <label>
+                  <input type="radio" name="deckSize" value="15" />
+                  <span>15 concepts</span>
+                </label>
+                <label>
+                  <input type="radio" name="deckSize" value="20" />
+                  <span>20 concepts</span>
+                </label>
+              </div>
+            </fieldset>
+
+            <div class="control-group">
+              <label for="category">Category</label>
+              <select id="category" name="category">
+                <option value="all">all</option>
+                <option value="verbs">verbs</option>
+                <option value="nouns">nouns</option>
+                <option value="adjectives">adjectives</option>
+                <option value="phrases">phrases</option>
+                <option value="demo" selected>demo words</option>
+              </select>
+            </div>
+
+            <button id="startButton" class="primary-button" type="submit" disabled>
+              Loading vocabulary...
+            </button>
+          </form>
+        </section>
+
+        <section id="gameScreen" class="game-screen" hidden>
+          <div class="game-toolbar">
+            <div>
+              <p id="modeLabel" class="eyebrow">Solo Practice</p>
+              <h2 id="deckLabel">Memory board</h2>
+            </div>
+            <div id="scoreboard" class="scoreboard" aria-live="polite"></div>
+          </div>
+
+          <div id="turnBanner" class="turn-banner" hidden>
+            <span>Current turn</span>
+            <strong id="currentTurnLabel">Thomas</strong>
+            <em id="currentGoalLabel">Say Thai</em>
+          </div>
+
+          <div id="board" class="memory-board" aria-live="polite"></div>
+        </section>
+      </main>
+    </div>
+
+    <div id="checkPanel" class="check-panel" role="dialog" aria-modal="true" hidden>
+      <div class="check-card">
+        <p id="checkKicker" class="eyebrow">Self Check</p>
+        <h2 id="checkTitle">Say-to-Win</h2>
+        <div id="checkPrompts" class="prompt-list"></div>
+        <div id="answerDetails" class="answer-details" hidden></div>
+        <div class="check-actions">
+          <button id="showAnswerButton" class="ghost-button" type="button">Show Answer</button>
+          <button id="wrongButton" class="danger-button" type="button">Wrong</button>
+          <button id="correctButton" class="primary-button" type="button">Correct</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="app.js?v=3"></script>
+  </body>
+</html>
