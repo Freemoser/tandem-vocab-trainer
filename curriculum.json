@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "courses": [
+    {
+      "id": "thai-class",
+      "label": "Thai class",
+      "teachers": [
+        {
+          "id": "aom",
+          "label": "Aom",
+          "lessons": [
+            {
+              "id": "2026-06-30",
+              "label": "30.06.2026",
+              "file": "lessons/thai-class/aom/2026-06-30.json",
+              "count": 25
+            },
+            {
+              "id": "2026-07-01",
+              "label": "01.07.2026",
+              "file": "lessons/thai-class/aom/2026-07-01.json",
+              "count": 25
+            }
+          ]
+        },
+        {
+          "id": "joomy",
+          "label": "Joomy",
+          "lessons": [
+            {
+              "id": "2026-06-30",
+              "label": "30.06.2026",
+              "file": "lessons/thai-class/joomy/2026-06-30.json",
+              "count": 25
+            },
+            {
+              "id": "2026-07-01",
+              "label": "01.07.2026",
+              "file": "lessons/thai-class/joomy/2026-07-01.json",
+              "count": 25
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

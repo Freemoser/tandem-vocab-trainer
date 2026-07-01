@@ -6,6 +6,8 @@ const elements = {
   gameScreen: document.querySelector("#gameScreen"),
   memoryOptions: document.querySelector("#memoryOptions"),
   tandemOptions: document.querySelector("#tandemOptions"),
+  lessonOptions: document.querySelector("#lessonOptions"),
+  lessonTree: document.querySelector("#lessonTree"),
   statusMessage: document.querySelector("#statusMessage"),
   modeLabel: document.querySelector("#modeLabel"),
   deckLabel: document.querySelector("#deckLabel"),
@@ -26,6 +28,8 @@ const elements = {
 };
 
 const state = {
+  curriculum: null,
+  lessonCache: new Map(),
   vocabulary: [],
   config: null,
   deck: [],
@@ -58,25 +62,27 @@ async function init() {
   wireEvents();
   updateModeOptions();
 
-  // Fetch keeps the vocabulary database local while still matching browser rules.
+  // Fetch keeps the lesson catalog local while still matching browser rules.
   try {
-    const response = await fetch("vocabulary.json");
+    const response = await fetch("curriculum.json");
 
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`);
     }
 
-    const vocabulary = await response.json();
-    state.vocabulary = validateVocabulary(vocabulary);
+    const curriculum = await response.json();
+    state.curriculum = validateCurriculum(curriculum);
+    renderLessonTree(state.curriculum);
+    updateModeOptions();
     elements.startButton.disabled = false;
     elements.startButton.textContent = "Start Game";
     hideStatus();
   } catch (error) {
     showStatus(
-      "Could not load vocabulary.json. Please run the app through a local server: python3 -m http.server",
+      "Could not load curriculum.json. Please run the app through a local server: python3 -m http.server",
       "error",
     );
-    elements.startButton.textContent = "Vocabulary not loaded";
+    elements.startButton.textContent = "Lesson data not loaded";
     console.error(error);
   }
 }
@@ -88,7 +94,13 @@ function wireEvents() {
 
   elements.setupForm.addEventListener("submit", (event) => {
     event.preventDefault();
-    startGame();
+    void startGame().catch((error) => {
+      showStatus(
+        "Could not load one of the selected lesson files. Please run the app through a local server: python3 -m http.server",
+        "error",
+      );
+      console.error(error);
+    });
   });
 
   elements.restartButton.addEventListener("click", () => {
@@ -114,7 +126,7 @@ function wireEvents() {
 
 function validateVocabulary(vocabulary) {
   if (!Array.isArray(vocabulary)) {
-    throw new Error("vocabulary.json must contain an array.");
+    throw new Error("Lesson files must contain an array.");
   }
 
   const requiredFields = [
@@ -132,12 +144,105 @@ function validateVocabulary(vocabulary) {
   vocabulary.forEach((item, index) => {
     requiredFields.forEach((field) => {
       if (!(field in item)) {
-        throw new Error(`Vocabulary item ${index + 1} is missing "${field}".`);
+        throw new Error(`Lesson item ${index + 1} is missing "${field}".`);
       }
     });
   });
 
   return vocabulary;
+}
+
+function validateCurriculum(curriculum) {
+  if (!curriculum || typeof curriculum !== "object" || !Array.isArray(curriculum.courses)) {
+    throw new Error("curriculum.json must contain a courses array.");
+  }
+
+  curriculum.courses.forEach((course, courseIndex) => {
+    if (!course.id || !course.label || !Array.isArray(course.teachers)) {
+      throw new Error(`Course ${courseIndex + 1} is missing id, label, or teachers.`);
+    }
+
+    course.teachers.forEach((teacher, teacherIndex) => {
+      if (!teacher.id || !teacher.label || !Array.isArray(teacher.lessons)) {
+        throw new Error(`Teacher ${teacherIndex + 1} in ${course.id} is missing data.`);
+      }
+
+      teacher.lessons.forEach((lesson, lessonIndex) => {
+        if (!lesson.id || !lesson.label || !lesson.file) {
+          throw new Error(`Lesson ${lessonIndex + 1} in ${course.id}/${teacher.id} is missing data.`);
+        }
+      });
+    });
+  });
+
+  return curriculum;
+}
+
+function renderLessonTree(curriculum) {
+  const courseMarkup = curriculum.courses
+    .map((course) => {
+      const teacherMarkup = course.teachers
+        .map((teacher) => {
+          const lessonMarkup = teacher.lessons
+            .map((lesson, index) => {
+              const checkboxId = `lesson-${course.id}-${teacher.id}-${lesson.id}`;
+              return `
+                <label class="lesson-option" for="${escapeHtml(checkboxId)}">
+                  <input
+                    id="${escapeHtml(checkboxId)}"
+                    type="checkbox"
+                    name="lessonSet"
+                    value="${escapeHtml(lesson.file)}"
+                    checked
+                  />
+                  <span>
+                    <strong>${escapeHtml(lesson.label)}</strong>
+                    <em>${escapeHtml(teacher.label)}</em>
+                  </span>
+                </label>
+              `;
+            })
+            .join("");
+
+          return `
+            <div class="lesson-teacher">
+              <h4>${escapeHtml(teacher.label)}</h4>
+              <div class="lesson-list">${lessonMarkup}</div>
+            </div>
+          `;
+        })
+        .join("");
+
+      return `
+        <section class="lesson-course">
+          <h3>${escapeHtml(course.label)}</h3>
+          <div class="lesson-course-grid">${teacherMarkup}</div>
+        </section>
+      `;
+    })
+    .join("");
+
+  elements.lessonTree.innerHTML = courseMarkup;
+}
+
+async function loadSelectedLessons(lessonFiles) {
+  const loadedLessons = await Promise.all(lessonFiles.map((file) => loadLessonFile(file)));
+  return loadedLessons.flat();
+}
+
+async function loadLessonFile(file) {
+  if (state.lessonCache.has(file)) {
+    return state.lessonCache.get(file);
+  }
+
+  const response = await fetch(file);
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status} for ${file}`);
+  }
+
+  const lessonItems = validateVocabulary(await response.json());
+  state.lessonCache.set(file, lessonItems);
+  return lessonItems;
 }
 
 function updateModeOptions() {
@@ -146,14 +251,24 @@ function updateModeOptions() {
   const showTandem = mode === "tandem";
   elements.memoryOptions.hidden = !showMemory;
   elements.tandemOptions.hidden = !showTandem;
+  elements.lessonOptions.hidden = !state.curriculum;
 }
 
-function startGame() {
+async function startGame() {
   hideStatus();
   resetBoardState();
 
   state.config = readConfig();
-  const concepts = chooseConcepts(state.config);
+  const lessons = state.config.selectedLessons;
+
+  if (!lessons.length) {
+    showStatus("Please choose at least one lesson.", "error");
+    return;
+  }
+
+  const lessonPool = await loadSelectedLessons(lessons);
+  state.vocabulary = lessonPool;
+  const concepts = chooseConcepts(state.config, lessonPool);
 
   if (state.config.mode === "memory") {
     // Memory mode keeps the classic rule: two cards per concept, match by id.
@@ -193,20 +308,17 @@ function readConfig() {
     learningDirection: document.querySelector("#learningDirection").value,
     playerCount: Number(document.querySelector('input[name="playerCount"]:checked')?.value || 2),
     deckSize: Number(document.querySelector('input[name="deckSize"]:checked').value),
-    category: document.querySelector("#category").value,
+    selectedLessons: Array.from(document.querySelectorAll('input[name="lessonSet"]:checked')).map(
+      (input) => input.value,
+    ),
   };
 }
 
-function chooseConcepts(config) {
-  const pool =
-    config.category === "all"
-      ? state.vocabulary
-      : state.vocabulary.filter((item) => item.category === config.category);
-
+function chooseConcepts(config, pool) {
   const selected = shuffle(pool).slice(0, config.deckSize);
 
   if (selected.length < config.deckSize) {
-    showStatus(`Only ${selected.length} concepts are available for this category.`, "error");
+    showStatus(`Only ${selected.length} concepts are available in the selected lessons.`, "error");
   }
 
   return selected;
@@ -955,15 +1067,18 @@ function getModeLabel(config) {
 }
 
 function getDeckLabel(config, conceptCount) {
+  const lessonCount = config.selectedLessons?.length || 0;
+  const lessonSuffix = lessonCount ? ` from ${lessonCount} lesson${lessonCount === 1 ? "" : "s"}` : "";
+
   if (config.mode === "flashcards") {
-    return `${conceptCount} flashcards`;
+    return `${conceptCount} flashcards${lessonSuffix}`;
   }
 
   if (config.mode === "tandem") {
-    return `${conceptCount} tandem prompts`;
+    return `${conceptCount} tandem prompts${lessonSuffix}`;
   }
 
-  return `${conceptCount} concepts`;
+  return `${conceptCount} concepts${lessonSuffix}`;
 }
 
 function resetBoardState() {
