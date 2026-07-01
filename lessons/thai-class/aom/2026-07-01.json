@@ -273,5 +273,115 @@
     "thai": "ยา",
     "thai_romanized": "yaa",
     "difficulty": 1
+  },
+  {
+    "id": "black",
+    "type": "word",
+    "category": "adjectives",
+    "emoji": "⚫",
+    "de": "schwarz",
+    "en": "black",
+    "thai": "สีดำ",
+    "thai_romanized": "sǐi dam",
+    "difficulty": 1
+  },
+  {
+    "id": "period",
+    "type": "word",
+    "category": "phrases",
+    "emoji": "🩸",
+    "de": "Periode",
+    "en": "period / menstruation",
+    "thai": "ประจำเดือน",
+    "thai_romanized": "bprà-jam-deuuan",
+    "difficulty": 2
+  },
+  {
+    "id": "on_the_boat",
+    "type": "phrase",
+    "category": "phrases",
+    "emoji": "🚤",
+    "de": "auf dem Boot",
+    "en": "on the boat",
+    "thai": "บนเรือ",
+    "thai_romanized": "bon ruea",
+    "difficulty": 1
+  },
+  {
+    "id": "how_long_already",
+    "type": "phrase",
+    "category": "phrases",
+    "emoji": "⏳",
+    "de": "wie lange schon?",
+    "en": "how long already?",
+    "thai": "นานยัง",
+    "thai_romanized": "naan yang",
+    "difficulty": 2
+  },
+  {
+    "id": "long_time",
+    "type": "word",
+    "category": "adjectives",
+    "emoji": "🕰️",
+    "de": "lange (Zeit)",
+    "en": "long (time)",
+    "thai": "นาน",
+    "thai_romanized": "naan",
+    "difficulty": 1
+  },
+  {
+    "id": "boat",
+    "type": "word",
+    "category": "nouns",
+    "emoji": "🛶",
+    "de": "Boot",
+    "en": "boat",
+    "thai": "เรือ",
+    "thai_romanized": "ruea",
+    "difficulty": 1
+  },
+  {
+    "id": "number",
+    "type": "word",
+    "category": "nouns",
+    "emoji": "🔢",
+    "de": "Zahl / Nummer",
+    "en": "number / digit",
+    "thai": "เลข",
+    "thai_romanized": "lêek",
+    "difficulty": 1
+  },
+  {
+    "id": "squid",
+    "type": "word",
+    "category": "nouns",
+    "emoji": "🦑",
+    "de": "Tintenfisch",
+    "en": "squid",
+    "thai": "ปลาหมึก",
+    "thai_romanized": "bplaa-mùek",
+    "difficulty": 2
+  },
+  {
+    "id": "crab",
+    "type": "word",
+    "category": "nouns",
+    "emoji": "🦀",
+    "de": "Krabbe",
+    "en": "crab",
+    "thai": "ปู",
+    "thai_romanized": "bpuu",
+    "difficulty": 1
+  },
+  {
+    "id": "late",
+    "type": "word",
+    "category": "adjectives",
+    "emoji": "⏰",
+    "de": "spät",
+    "en": "late",
+    "thai": "สาย",
+    "thai_romanized": "sǎai",
+    "difficulty": 1
   }
 ]
