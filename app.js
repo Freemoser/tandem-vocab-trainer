@@ -184,7 +184,7 @@ function renderLessonTree(curriculum) {
       const teacherMarkup = course.teachers
         .map((teacher) => {
           const lessonMarkup = teacher.lessons
-            .map((lesson, index) => {
+            .map((lesson) => {
               const checkboxId = `lesson-${course.id}-${teacher.id}-${lesson.id}`;
               return `
                 <label class="lesson-option" for="${escapeHtml(checkboxId)}">
@@ -197,7 +197,7 @@ function renderLessonTree(curriculum) {
                   />
                   <span>
                     <strong>${escapeHtml(lesson.label)}</strong>
-                    <em>${escapeHtml(teacher.label)}</em>
+                    <em>${escapeHtml(teacher.label)} · ${escapeHtml(String(lesson.count || 0))} cards</em>
                   </span>
                 </label>
               `;
@@ -227,7 +227,13 @@ function renderLessonTree(curriculum) {
 
 async function loadSelectedLessons(lessonFiles) {
   const loadedLessons = await Promise.all(lessonFiles.map((file) => loadLessonFile(file)));
-  return loadedLessons.flat();
+  const unique = new Map();
+
+  loadedLessons.flat().forEach((concept) => {
+    unique.set(concept.id, concept);
+  });
+
+  return Array.from(unique.values());
 }
 
 async function loadLessonFile(file) {
