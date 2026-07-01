@@ -22,6 +22,18 @@
               "count": 10
             }
           ]
+        },
+        {
+          "id": "joomy",
+          "label": "Joomy",
+          "lessons": [
+            {
+              "id": "2027-07-01",
+              "label": "01.07.2027",
+              "file": "lessons/thai-class/joomy/2027-07-01.json",
+              "count": 13
+            }
+          ]
         }
       ]
     }

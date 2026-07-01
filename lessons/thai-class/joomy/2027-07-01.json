@@ -1,0 +1,145 @@
+[
+  {
+    "id": "ghost",
+    "type": "word",
+    "category": "nouns",
+    "emoji": "👻",
+    "de": "Geist",
+    "en": "ghost",
+    "thai": "ผี",
+    "thai_romanized": "pǐi",
+    "difficulty": 1
+  },
+  {
+    "id": "real",
+    "type": "word",
+    "category": "adjectives",
+    "emoji": "✅",
+    "de": "echt / real",
+    "en": "is real",
+    "thai": "มีจริง",
+    "thai_romanized": "mii jing",
+    "difficulty": 1
+  },
+  {
+    "id": "world",
+    "type": "word",
+    "category": "nouns",
+    "emoji": "🌍",
+    "de": "Welt",
+    "en": "world",
+    "thai": "โลก",
+    "thai_romanized": "lôok",
+    "difficulty": 1
+  },
+  {
+    "id": "live_music",
+    "type": "word",
+    "category": "phrases",
+    "emoji": "🎵",
+    "de": "Live-Musik",
+    "en": "live music",
+    "thai": "ดนตรีสด",
+    "thai_romanized": "don dtrii sòt",
+    "difficulty": 2
+  },
+  {
+    "id": "hear",
+    "type": "word",
+    "category": "verbs",
+    "emoji": "👂",
+    "de": "hören",
+    "en": "hear",
+    "thai": "ได้ยิน",
+    "thai_romanized": "dâai yin",
+    "difficulty": 1
+  },
+  {
+    "id": "someday",
+    "type": "phrase",
+    "category": "phrases",
+    "emoji": "⏳",
+    "de": "irgendwann (eines Tages)",
+    "en": "someday",
+    "thai": "สักวันหนึ่ง",
+    "thai_romanized": "sák wan nʉ̀eng",
+    "difficulty": 2
+  },
+  {
+    "id": "some_days",
+    "type": "phrase",
+    "category": "phrases",
+    "emoji": "📅",
+    "de": "manche Tage",
+    "en": "some days",
+    "thai": "บางวัน",
+    "thai_romanized": "baang wan",
+    "difficulty": 1
+  },
+  {
+    "id": "story",
+    "type": "word",
+    "category": "nouns",
+    "emoji": "📖",
+    "de": "Geschichte",
+    "en": "story",
+    "thai": "เรื่อง",
+    "thai_romanized": "rêuang",
+    "difficulty": 1
+  },
+  {
+    "id": "within",
+    "type": "word",
+    "category": "prepositions",
+    "emoji": "📍",
+    "de": "innerhalb",
+    "en": "within",
+    "thai": "ภายใน",
+    "thai_romanized": "phaai nai",
+    "difficulty": 2
+  },
+  {
+    "id": "force",
+    "type": "word",
+    "category": "verbs",
+    "emoji": "🫸",
+    "de": "zwingen",
+    "en": "force",
+    "thai": "บังคับ",
+    "thai_romanized": "bang káp",
+    "difficulty": 2
+  },
+  {
+    "id": "bed",
+    "type": "word",
+    "category": "nouns",
+    "emoji": "🛏️",
+    "de": "Bett",
+    "en": "bed",
+    "thai": "เตียง",
+    "thai_romanized": "dtiiang",
+    "difficulty": 1
+  },
+  {
+    "id": "separate",
+    "type": "word",
+    "category": "verbs",
+    "emoji": "✂️",
+    "de": "trennen",
+    "en": "separate",
+    "thai": "แยก",
+    "thai_romanized": "yâek",
+    "difficulty": 1
+  },
+  {
+    "id": "ant",
+    "type": "word",
+    "category": "nouns",
+    "emoji": "🐜",
+    "de": "Ameise",
+    "en": "ant",
+    "thai": "มดแดง",
+    "thai_romanized": "mót daeng",
+    "difficulty": 2
+  }
+]
