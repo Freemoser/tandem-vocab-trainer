@@ -304,6 +304,11 @@ select {
   grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
 }
 
+.memory-board.flashcard-board {
+  grid-template-columns: minmax(280px, 680px);
+  justify-content: center;
+}
+
 .memory-card {
   display: block;
   width: 100%;
@@ -421,6 +426,26 @@ select {
 
 .tandem-card .card-front {
   background: var(--surface);
+}
+
+.flashcard-card {
+  aspect-ratio: 16 / 9;
+}
+
+.flashcard-board .card-face {
+  padding: 20px;
+}
+
+.flashcard-board .card-lines {
+  gap: 8px;
+}
+
+.flashcard-board .card-lines .primary {
+  font-size: clamp(1.4rem, 2.2vw, 2.2rem);
+}
+
+.flashcard-board .card-lines .secondary {
+  font-size: clamp(1.05rem, 1.4vw, 1.4rem);
 }
 
 .tandem-card.is-current-player:not(.is-revealed):not(.is-matched) .card-front {
@@ -583,6 +608,100 @@ select {
   gap: 10px;
 }
 
+.review-summary {
+  display: grid;
+  gap: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.94);
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+
+.review-summary-head {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.review-summary-head strong,
+.review-item em {
+  display: block;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-style: normal;
+  font-weight: 850;
+  text-align: center;
+}
+
+.review-summary-head strong {
+  background: var(--surface-strong);
+}
+
+.review-summary-list {
+  display: grid;
+  gap: 10px;
+  max-height: 320px;
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.review-item {
+  display: grid;
+  gap: 5px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfcff;
+  padding: 12px;
+}
+
+.review-item strong {
+  overflow-wrap: anywhere;
+  font-size: 1rem;
+}
+
+.review-item span {
+  color: var(--muted);
+  font-size: 0.92rem;
+  font-weight: 750;
+}
+
+.review-item em {
+  justify-self: start;
+  min-width: 110px;
+  padding-inline: 10px;
+}
+
+.review-item.correct em {
+  background: #ebfbee;
+  color: #237a33;
+}
+
+.review-item.wrong em {
+  background: #fff0f3;
+  color: #a4133c;
+}
+
+.review-finished {
+  display: grid;
+  gap: 6px;
+  border: 1px solid rgba(47, 158, 68, 0.25);
+  border-radius: 8px;
+  background: #ebfbee;
+  padding: 14px;
+}
+
+.review-finished h3 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.review-finished p {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 750;
+}
+
 @media (max-width: 780px) {
   .app-header,
   .game-toolbar {
@@ -613,6 +732,14 @@ select {
   .memory-board {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .memory-board.flashcard-board {
+    grid-template-columns: 1fr;
+  }
+
+  .review-summary-head {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 460px) {
@@ -627,5 +754,9 @@ select {
 
   .card-back {
     padding: 10px;
+  }
+
+  .flashcard-board .card-face {
+    padding: 14px;
   }
 }

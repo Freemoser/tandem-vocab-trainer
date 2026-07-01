@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Thai Learning Memory</title>
-    <link rel="stylesheet" href="style.css?v=5" />
+    <link rel="stylesheet" href="style.css?v=7" />
   </head>
   <body>
     <div class="app-shell">
@@ -32,18 +32,22 @@
               <legend>Play mode</legend>
               <div class="segmented-control">
                 <label>
-                  <input type="radio" name="playMode" value="solo" />
-                  <span>Solo Practice</span>
+                  <input type="radio" name="playMode" value="memory" />
+                  <span>Memory Match</span>
                 </label>
                 <label>
                   <input type="radio" name="playMode" value="tandem" checked />
-                  <span>Tandem Flip Game</span>
+                  <span>Tandem Practice</span>
+                </label>
+                <label>
+                  <input type="radio" name="playMode" value="flashcards" />
+                  <span>Flashcard Review</span>
                 </label>
               </div>
             </fieldset>
 
-            <div id="soloOptions" class="control-group">
-              <label for="learningDirection">Solo learning direction</label>
+            <div id="memoryOptions" class="control-group">
+              <label for="learningDirection">Memory learning direction</label>
               <select id="learningDirection" name="learningDirection">
                 <option value="de_en_to_thai">German/English -&gt; Thai</option>
                 <option value="en_to_thai">English -&gt; Thai</option>
@@ -125,6 +129,7 @@
           </div>
 
           <div id="board" class="memory-board" aria-live="polite"></div>
+          <div id="reviewSummary" class="review-summary" hidden></div>
         </section>
       </main>
     </div>
@@ -143,6 +148,6 @@
       </div>
     </div>
 
-    <script src="app.js?v=4"></script>
+    <script src="app.js?v=6"></script>
   </body>
 </html>

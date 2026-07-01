@@ -4,7 +4,7 @@ const elements = {
   restartButton: document.querySelector("#restartButton"),
   startScreen: document.querySelector("#startScreen"),
   gameScreen: document.querySelector("#gameScreen"),
-  soloOptions: document.querySelector("#soloOptions"),
+  memoryOptions: document.querySelector("#memoryOptions"),
   tandemOptions: document.querySelector("#tandemOptions"),
   statusMessage: document.querySelector("#statusMessage"),
   modeLabel: document.querySelector("#modeLabel"),
@@ -14,6 +14,7 @@ const elements = {
   currentGoalLabel: document.querySelector("#currentGoalLabel"),
   scoreboard: document.querySelector("#scoreboard"),
   board: document.querySelector("#board"),
+  reviewSummary: document.querySelector("#reviewSummary"),
   checkPanel: document.querySelector("#checkPanel"),
   checkKicker: document.querySelector("#checkKicker"),
   checkTitle: document.querySelector("#checkTitle"),
@@ -30,7 +31,7 @@ const state = {
   deck: [],
   selectedCards: [],
   pendingMatch: null,
-  pendingChallenge: null,
+  pendingPrompt: null,
   lockBoard: false,
   attempts: 0,
   matchedPairs: 0,
@@ -38,11 +39,16 @@ const state = {
   players: [],
   currentPlayerIndex: 0,
   boardColumns: 4,
+  reviewDeck: [],
+  reviewIndex: 0,
+  reviewResults: [],
   scores: {
-    solo: 0,
     thomas: 0,
     teacher: 0,
     team: 0,
+    memory: 0,
+    flashcardCorrect: 0,
+    flashcardWrong: 0,
   },
 };
 
@@ -136,9 +142,10 @@ function validateVocabulary(vocabulary) {
 
 function updateModeOptions() {
   const mode = document.querySelector('input[name="playMode"]:checked').value;
-  const isSolo = mode === "solo";
-  elements.soloOptions.hidden = !isSolo;
-  elements.tandemOptions.hidden = isSolo;
+  const showMemory = mode === "memory";
+  const showTandem = mode === "tandem";
+  elements.memoryOptions.hidden = !showMemory;
+  elements.tandemOptions.hidden = !showTandem;
 }
 
 function startGame() {
@@ -148,30 +155,36 @@ function startGame() {
   state.config = readConfig();
   const concepts = chooseConcepts(state.config);
 
-  if (state.config.mode === "tandem") {
+  if (state.config.mode === "memory") {
+    // Memory mode keeps the classic rule: two cards per concept, match by id.
+    state.totalPairs = concepts.length;
+    state.deck = shuffle(concepts.flatMap((concept) => buildCardsForConcept(concept, state.config)));
+  } else if (state.config.mode === "tandem") {
     setupTandemPlayers(state.config);
     state.deck = shuffle(
-      concepts.flatMap((concept, index) => buildTandemCardsForConcept(concept, state.config, index)),
+      concepts.flatMap((concept, index) => buildPromptDeck(concept, index, "tandem")),
     );
     state.totalPairs = state.deck.length;
   } else {
-    // Solo mode keeps the classic memory rule: two cards per concept, match by id.
-    state.totalPairs = concepts.length;
-    state.deck = shuffle(concepts.flatMap((concept) => buildCardsForConcept(concept, state.config)));
+    state.reviewDeck = shuffle(
+      concepts.flatMap((concept, index) => buildPromptDeck(concept, index, "flashcards")),
+    );
+    state.reviewIndex = 0;
+    state.reviewResults = [];
+    state.totalPairs = state.reviewDeck.length;
+    state.deck = [];
   }
 
   elements.startScreen.hidden = true;
   elements.gameScreen.hidden = false;
   elements.restartButton.hidden = false;
   elements.modeLabel.textContent = getModeLabel(state.config);
-  elements.deckLabel.textContent =
-    state.config.mode === "tandem"
-      ? `${concepts.length} concepts / ${state.deck.length} challenge cards`
-      : `${concepts.length} concepts / ${concepts.length * 2} cards`;
+  elements.deckLabel.textContent = getDeckLabel(state.config, concepts.length);
 
   renderScoreboard();
   renderBoard();
   renderTurnBanner();
+  renderReviewSummary();
 }
 
 function readConfig() {
@@ -288,61 +301,48 @@ function setupTandemPlayers(config) {
   state.currentPlayerIndex = 0;
 }
 
-function buildTandemCardsForConcept(concept, config, index) {
-  const thomasCard = {
-    uid: `${concept.id}-thomas-${makeId()}`,
+function buildPromptDeck(concept, index, mode) {
+  const promptDirection = index % 2 === 0 ? "en_to_thai" : "thai_to_en";
+  const promptCard = createPromptCard(concept, promptDirection, mode);
+  return [promptCard];
+}
+
+function createPromptCard(concept, promptDirection, mode) {
+  const isEnglishPrompt = promptDirection === "en_to_thai";
+  const frontLines = isEnglishPrompt ? [concept.en] : [concept.thai, concept.thai_romanized];
+  const answerLines = isEnglishPrompt ? [concept.thai, concept.thai_romanized] : [concept.en];
+  const answerLanguage = isEnglishPrompt ? "Thai" : "English";
+
+  return {
+    uid: `${concept.id}-${promptDirection}-${makeId()}`,
     conceptId: concept.id,
     concept,
     flipped: false,
     matched: false,
     feedback: "",
-    mode: "tandem",
-    playerId: "thomas",
-    playerName: "Thomas",
-    scoreKey: "thomas",
-    goal: "Say Thai",
-    frontKind: "English",
-    frontLines: [concept.en],
+    mode,
+    promptDirection,
+    promptLanguage: isEnglishPrompt ? "English" : "Thai",
+    answerLanguage,
+    frontKind: isEnglishPrompt ? "English" : "Thai",
+    frontLines,
     frontHelper: "",
-    backKind: "Thai answer",
-    backLines: [concept.thai, concept.thai_romanized],
-    backHelper: `German helper: ${concept.de}`,
+    backKind: `${answerLanguage} answer`,
+    backLines: answerLines,
+    backHelper: isEnglishPrompt
+      ? `Romanized: ${concept.thai_romanized} / German helper: ${concept.de}`
+      : `German helper: ${concept.de}`,
   };
-
-  if (config.playerCount === 1) {
-    return [thomasCard];
-  }
-
-  if (index % 2 === 0) {
-    return [thomasCard];
-  }
-
-  return [
-    {
-      uid: `${concept.id}-teacher-${makeId()}`,
-      conceptId: concept.id,
-      concept,
-      flipped: false,
-      matched: false,
-      feedback: "",
-      mode: "tandem",
-      playerId: "teacher",
-      playerName: "Teacher",
-      scoreKey: "teacher",
-      goal: "Say English",
-      frontKind: "Thai",
-      frontLines: [concept.thai],
-      frontHelper: "",
-      backKind: "English answer",
-      backLines: [concept.en],
-      backHelper: `Romanized: ${concept.thai_romanized} / German helper: ${concept.de}`,
-    },
-  ];
 }
 
 function handleCardClick(uid) {
   if (state.config?.mode === "tandem") {
     handleTandemCardClick(uid);
+    return;
+  }
+
+  if (state.config?.mode === "flashcards") {
+    handleFlashcardClick(uid);
     return;
   }
 
@@ -361,20 +361,14 @@ function handleCardClick(uid) {
 }
 
 function handleTandemCardClick(uid) {
-  if (state.lockBoard || state.pendingChallenge) return;
+  if (state.lockBoard || state.pendingPrompt) return;
 
   const card = state.deck.find((item) => item.uid === uid);
   if (!card || card.flipped || card.matched) return;
 
-  const currentPlayer = getCurrentPlayer();
-  if (card.playerId !== currentPlayer.id) {
-    showStatus(`${currentPlayer.name} is up. Pick a ${currentPlayer.name} card.`, "error");
-    return;
-  }
-
   hideStatus();
   card.flipped = true;
-  state.pendingChallenge = { card };
+  state.pendingPrompt = { card };
   state.lockBoard = true;
   state.attempts += 1;
 
@@ -384,6 +378,25 @@ function handleTandemCardClick(uid) {
 
   window.setTimeout(() => {
     showTandemPanel(card);
+  }, 250);
+}
+
+function handleFlashcardClick(uid) {
+  if (state.lockBoard || state.pendingPrompt) return;
+
+  const card = state.reviewDeck[state.reviewIndex];
+  if (!card || card.uid !== uid || card.flipped || card.matched) return;
+
+  hideStatus();
+  card.flipped = true;
+  state.pendingPrompt = { card, reviewMode: true };
+  state.lockBoard = true;
+  state.attempts += 1;
+  renderBoard();
+  renderScoreboard();
+
+  window.setTimeout(() => {
+    showFlashcardPanel(card);
   }, 250);
 }
 
@@ -419,8 +432,7 @@ function showCheckPanel(concept) {
   const prompts = getPrompts(concept, state.config);
 
   elements.checkPanel.classList.remove("tandem-panel");
-  // The panel is intentionally explicit for screen sharing: everyone can see who says what.
-  elements.checkKicker.textContent = state.config.mode === "solo" ? "Self Check" : "Say-to-Win";
+  elements.checkKicker.textContent = "Self Check";
   elements.checkTitle.textContent = concept.emoji + " " + getPanelTitle(concept);
   elements.checkPrompts.innerHTML = prompts
     .map(
@@ -442,13 +454,36 @@ function showCheckPanel(concept) {
 
 function showTandemPanel(card) {
   elements.checkPanel.classList.add("tandem-panel");
+  const currentPlayer = getCurrentPlayer();
   elements.checkKicker.textContent = "Tandem Check";
-  elements.checkTitle.textContent = `${card.playerName}: ${card.goal}`;
+  elements.checkTitle.textContent = `${currentPlayer.name} should answer`;
   elements.checkPrompts.innerHTML = `
     <div class="prompt-row">
-      <span>Card showed</span>
+      <span>Card prompt</span>
       <strong>${escapeHtml(card.frontLines.join(" / "))}</strong>
-      ${card.frontHelper ? `<p class="helper-note">${escapeHtml(card.frontHelper)}</p>` : ""}
+    </div>
+    <div class="prompt-row">
+      <span>Answer</span>
+      <strong>${escapeHtml(card.backLines.join(" / "))}</strong>
+      ${card.backHelper ? `<p class="helper-note">${escapeHtml(card.backHelper)}</p>` : ""}
+    </div>
+  `;
+  elements.answerDetails.innerHTML = buildAnswerDetails(card.concept);
+  elements.answerDetails.hidden = true;
+  elements.showAnswerButton.textContent = "Show Answer";
+  elements.correctButton.textContent = "Correct";
+  elements.wrongButton.textContent = "Wrong";
+  elements.checkPanel.hidden = false;
+}
+
+function showFlashcardPanel(card) {
+  elements.checkPanel.classList.add("tandem-panel");
+  elements.checkKicker.textContent = "Flashcard Review";
+  elements.checkTitle.textContent = "Check yourself";
+  elements.checkPrompts.innerHTML = `
+    <div class="prompt-row">
+      <span>Prompt</span>
+      <strong>${escapeHtml(card.frontLines.join(" / "))}</strong>
     </div>
     <div class="prompt-row">
       <span>Answer</span>
@@ -507,7 +542,7 @@ function getSoloTarget(concept, learningDirection) {
 }
 
 function getPanelTitle(concept) {
-  return state.config.mode === "solo" ? "Check your answer" : "Say the word";
+  return state.config.mode === "tandem" ? "Say the word" : "Check your answer";
 }
 
 function buildAnswerDetails(concept) {
@@ -544,7 +579,12 @@ function toggleAnswerDetails() {
 
 function acceptPendingMatch() {
   if (state.config?.mode === "tandem") {
-    acceptPendingChallenge();
+    acceptPendingPrompt();
+    return;
+  }
+
+  if (state.config?.mode === "flashcards") {
+    acceptPendingFlashcard();
     return;
   }
 
@@ -556,8 +596,7 @@ function acceptPendingMatch() {
   });
 
   state.matchedPairs += 1;
-
-  state.scores.solo += 10;
+  state.scores.memory += 10;
 
   clearPendingTurn();
   renderBoard();
@@ -567,7 +606,12 @@ function acceptPendingMatch() {
 
 function rejectPendingMatch() {
   if (state.config?.mode === "tandem") {
-    rejectPendingChallenge();
+    rejectPendingPrompt();
+    return;
+  }
+
+  if (state.config?.mode === "flashcards") {
+    rejectPendingFlashcard();
     return;
   }
 
@@ -582,19 +626,19 @@ function rejectPendingMatch() {
   renderScoreboard();
 }
 
-function acceptPendingChallenge() {
-  if (!state.pendingChallenge) return;
+function acceptPendingPrompt() {
+  if (!state.pendingPrompt) return;
 
-  const { card } = state.pendingChallenge;
+  const { card } = state.pendingPrompt;
   card.matched = true;
   card.flipped = true;
   card.feedback = "";
 
   state.matchedPairs += 1;
-  state.scores[card.scoreKey] += 1;
+  state.scores[getCurrentPlayer().scoreKey] += 1;
   state.scores.team += 1;
 
-  clearPendingChallenge();
+  clearPendingPrompt();
   advancePlayer();
   renderBoard();
   renderScoreboard();
@@ -602,10 +646,10 @@ function acceptPendingChallenge() {
   checkForFinishedGame();
 }
 
-function rejectPendingChallenge() {
-  if (!state.pendingChallenge) return;
+function rejectPendingPrompt() {
+  if (!state.pendingPrompt) return;
 
-  const { card } = state.pendingChallenge;
+  const { card } = state.pendingPrompt;
   card.feedback = "wrong";
   hideCheckPanel();
   renderBoard();
@@ -613,11 +657,50 @@ function rejectPendingChallenge() {
   window.setTimeout(() => {
     card.feedback = "";
     card.flipped = false;
-    clearPendingChallenge();
+    clearPendingPrompt();
     advancePlayer();
     renderBoard();
     renderScoreboard();
     renderTurnBanner();
+  }, 700);
+}
+
+function acceptPendingFlashcard() {
+  if (!state.pendingPrompt) return;
+
+  const { card } = state.pendingPrompt;
+  card.matched = true;
+  card.flipped = true;
+  card.feedback = "";
+
+  state.reviewResults.push({
+    card,
+    result: "correct",
+  });
+  state.scores.flashcardCorrect += 1;
+
+  clearPendingPrompt();
+  advanceFlashcard();
+}
+
+function rejectPendingFlashcard() {
+  if (!state.pendingPrompt) return;
+
+  const { card } = state.pendingPrompt;
+  card.feedback = "wrong";
+  hideCheckPanel();
+  renderBoard();
+
+  window.setTimeout(() => {
+    card.feedback = "";
+    card.flipped = false;
+    state.reviewResults.push({
+      card,
+      result: "wrong",
+    });
+    state.scores.flashcardWrong += 1;
+    clearPendingPrompt();
+    advanceFlashcard();
   }, 700);
 }
 
@@ -628,8 +711,8 @@ function clearPendingTurn() {
   hideCheckPanel();
 }
 
-function clearPendingChallenge() {
-  state.pendingChallenge = null;
+function clearPendingPrompt() {
+  state.pendingPrompt = null;
   state.lockBoard = false;
   hideCheckPanel();
 }
@@ -641,27 +724,44 @@ function hideCheckPanel() {
 }
 
 function checkForFinishedGame() {
+  if (state.config?.mode !== "memory") return;
   if (state.matchedPairs !== state.totalPairs) return;
 
   const message =
-    state.config.mode === "solo"
-      ? `Finished: ${state.scores.solo} points in ${state.attempts} attempts.`
-      : `Finished: team score ${state.scores.team} in ${state.attempts} attempts.`;
+    `Finished: ${state.scores.memory} points in ${state.attempts} attempts.`;
 
   showStatus(message, "success");
 }
 
 function renderBoard() {
   elements.board.classList.toggle("tandem-board", state.config?.mode === "tandem");
-  elements.board.innerHTML = state.deck
-    .map((card, index) => renderCard(card, getCardCoordinate(index)))
-    .join("");
+  elements.board.classList.toggle("flashcard-board", state.config?.mode === "flashcards");
+
+  if (state.config?.mode === "flashcards") {
+    const card = state.reviewDeck[state.reviewIndex];
+    elements.board.innerHTML = card ? renderFlashcard(card, getCardCoordinate(0)) : "";
+    elements.board.hidden = !card && state.reviewResults.length === 0;
+    window.requestAnimationFrame(updateBoardCoordinates);
+    renderReviewSummary();
+    return;
+  }
+
+  elements.board.hidden = false;
+  elements.board.innerHTML =
+    state.config?.mode === "memory"
+      ? state.deck.map((card, index) => renderCard(card, getCardCoordinate(index))).join("")
+      : state.deck.map((card, index) => renderCard(card, getCardCoordinate(index))).join("");
   window.requestAnimationFrame(updateBoardCoordinates);
+  renderReviewSummary();
 }
 
 function renderCard(card, coordinate) {
   if (state.config?.mode === "tandem") {
     return renderTandemCard(card, coordinate);
+  }
+
+  if (state.config?.mode === "flashcards") {
+    return renderFlashcard(card);
   }
 
   const statusClass = [
@@ -698,33 +798,27 @@ function renderCard(card, coordinate) {
 }
 
 function renderTandemCard(card, coordinate) {
-  const currentPlayer = getCurrentPlayer();
-  const isCurrentPlayer = card.playerId === currentPlayer.id;
-  const isWaiting = !card.matched && !isCurrentPlayer;
-  const isDisabled = state.lockBoard || state.pendingChallenge || card.matched || !isCurrentPlayer;
   const statusClass = [
     "memory-card",
     "tandem-card",
     card.flipped ? "is-revealed" : "",
     card.matched ? "is-matched" : "",
     card.feedback === "wrong" ? "is-wrong" : "",
-    isCurrentPlayer ? "is-current-player" : "",
-    isWaiting ? "is-waiting" : "",
   ]
     .filter(Boolean)
     .join(" ");
 
   return `
-    <button class="${statusClass}" type="button" data-uid="${escapeHtml(card.uid)}" data-base-label="${escapeHtml(card.playerName)} challenge card" aria-label="${escapeHtml(coordinate)} ${escapeHtml(card.playerName)} challenge card" ${isDisabled ? "disabled" : ""}>
+    <button class="${statusClass}" type="button" data-uid="${escapeHtml(card.uid)}" data-base-label="Tandem card" aria-label="${escapeHtml(coordinate)} Tandem card">
       <span class="card-inner">
-        ${renderTandemFace("card-front", coordinate, card.concept.emoji, card.frontKind, card.frontLines, card.frontHelper, card.playerName)}
-        ${renderTandemFace("card-back", coordinate, card.concept.emoji, card.backKind, card.backLines, card.backHelper, card.goal)}
+        ${renderTandemFace("card-front", coordinate, card.concept.emoji, card.frontKind, card.frontLines, card.frontHelper)}
+        ${renderTandemFace("card-back", coordinate, card.concept.emoji, card.backKind, card.backLines, card.backHelper)}
       </span>
     </button>
   `;
 }
 
-function renderTandemFace(faceClass, coordinate, emoji, label, lines, helper, owner) {
+function renderTandemFace(faceClass, coordinate, emoji, label, lines, helper) {
   const isFront = faceClass.includes("card-front");
   const lineMarkup = lines
     .map(
@@ -734,14 +828,58 @@ function renderTandemFace(faceClass, coordinate, emoji, label, lines, helper, ow
     .join("");
 
   return `
-    <span class="card-face ${faceClass}">
+      <span class="card-face ${faceClass}">
       <span class="card-coordinate">${escapeHtml(coordinate)}</span>
-      ${isFront ? "" : `<span class="challenge-owner">${escapeHtml(owner)}</span>`}
       <span class="card-emoji" aria-hidden="true">${escapeHtml(emoji)}</span>
       <span class="card-lines">${lineMarkup}</span>
       ${!isFront && helper ? `<span class="card-helper">${escapeHtml(helper)}</span>` : ""}
       ${isFront ? "" : `<span class="card-tag">${escapeHtml(label)}</span>`}
     </span>
+  `;
+}
+
+function renderFlashcard(card, coordinate) {
+  const statusClass = [
+    "memory-card",
+    "flashcard-card",
+    card.flipped ? "is-revealed" : "",
+    card.matched ? "is-matched" : "",
+    card.feedback === "wrong" ? "is-wrong" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const lineMarkup = card.frontLines
+    .map(
+      (line, index) =>
+        `<span class="${index === 0 ? "primary" : "secondary"}">${escapeHtml(line)}</span>`,
+    )
+    .join("");
+
+  const answerMarkup = card.backLines
+    .map(
+      (line, index) =>
+        `<span class="${index === 0 ? "primary" : "secondary"}">${escapeHtml(line)}</span>`,
+    )
+    .join("");
+
+  return `
+    <button class="${statusClass}" type="button" data-uid="${escapeHtml(card.uid)}" data-base-label="Flashcard" aria-label="${escapeHtml(coordinate)} Flashcard">
+      <span class="card-inner">
+        <span class="card-face card-front">
+          <span class="card-coordinate">${escapeHtml(coordinate)}</span>
+          <span class="card-emoji" aria-hidden="true">${escapeHtml(card.concept.emoji)}</span>
+          <span class="card-lines">${lineMarkup}</span>
+        </span>
+        <span class="card-face card-back">
+          <span class="card-coordinate">${escapeHtml(coordinate)}</span>
+          <span class="card-emoji" aria-hidden="true">${escapeHtml(card.concept.emoji)}</span>
+          <span class="card-lines">${answerMarkup}</span>
+          ${card.backHelper ? `<span class="card-helper">${escapeHtml(card.backHelper)}</span>` : ""}
+          <span class="card-tag">${escapeHtml(card.answerLanguage)}</span>
+        </span>
+      </span>
+    </button>
   `;
 }
 
@@ -756,8 +894,15 @@ function renderScoreboard() {
           ["Attempts", state.attempts],
           ["Solved", `${state.matchedPairs}/${state.totalPairs}`],
         ]
+      : state.config?.mode === "flashcards"
+        ? [
+            ["Correct", state.scores.flashcardCorrect],
+            ["Wrong", state.scores.flashcardWrong],
+            ["Remaining", `${Math.max(0, state.totalPairs - state.reviewResults.length)}`],
+            ["Reviewed", `${state.reviewResults.length}/${state.totalPairs}`],
+          ]
       : [
-          ["Score", state.scores.solo],
+          ["Score", state.scores.memory],
           ["Attempts", state.attempts],
           ["Matched", `${state.matchedPairs}/${state.totalPairs}`],
         ];
@@ -789,26 +934,43 @@ function renderTurnBanner() {
 function getModeLabel(config) {
   if (config.mode === "tandem") {
     return config.playerCount === 2
-      ? "Tandem Flip Game: Thomas + Teacher"
-      : "Tandem Flip Game: Thomas";
+      ? "Tandem Practice: Thomas + Teacher"
+      : "Tandem Practice: Thomas";
+  }
+
+  if (config.mode === "flashcards") {
+    return "Flashcard Review";
   }
 
   const labels = {
-    de_en_to_thai: "Solo: German/English -> Thai",
-    en_to_thai: "Solo: English -> Thai",
-    thai_to_en: "Solo: Thai -> English",
-    thai_to_de: "Solo: Thai -> German",
-    de_to_thai: "Solo: German -> Thai",
+    memory: "Memory Match",
+    de_en_to_thai: "Memory: German/English -> Thai",
+    en_to_thai: "Memory: English -> Thai",
+    thai_to_en: "Memory: Thai -> English",
+    thai_to_de: "Memory: Thai -> German",
+    de_to_thai: "Memory: German -> Thai",
   };
 
   return labels[config.learningDirection];
+}
+
+function getDeckLabel(config, conceptCount) {
+  if (config.mode === "flashcards") {
+    return `${conceptCount} flashcards`;
+  }
+
+  if (config.mode === "tandem") {
+    return `${conceptCount} tandem prompts`;
+  }
+
+  return `${conceptCount} concepts`;
 }
 
 function resetBoardState() {
   state.deck = [];
   state.selectedCards = [];
   state.pendingMatch = null;
-  state.pendingChallenge = null;
+  state.pendingPrompt = null;
   state.lockBoard = false;
   state.attempts = 0;
   state.matchedPairs = 0;
@@ -816,13 +978,95 @@ function resetBoardState() {
   state.players = [];
   state.currentPlayerIndex = 0;
   state.boardColumns = 4;
+  state.reviewDeck = [];
+  state.reviewIndex = 0;
+  state.reviewResults = [];
   state.scores = {
-    solo: 0,
     thomas: 0,
     teacher: 0,
     team: 0,
+    memory: 0,
+    flashcardCorrect: 0,
+    flashcardWrong: 0,
   };
   elements.turnBanner.hidden = true;
+  elements.reviewSummary.hidden = true;
+}
+
+function advanceFlashcard() {
+  state.reviewIndex += 1;
+  state.pendingPrompt = null;
+  state.lockBoard = false;
+  renderBoard();
+  renderScoreboard();
+  renderReviewSummary();
+  hideCheckPanel();
+
+  if (state.reviewIndex >= state.reviewDeck.length) {
+    showReviewFinished();
+    return;
+  }
+}
+
+function renderReviewSummary() {
+  if (state.config?.mode !== "flashcards") {
+    elements.reviewSummary.hidden = true;
+    elements.reviewSummary.innerHTML = "";
+    return;
+  }
+
+  if (!state.reviewResults.length && state.reviewIndex === 0) {
+    elements.reviewSummary.hidden = true;
+    elements.reviewSummary.innerHTML = "";
+    return;
+  }
+
+  const items = state.reviewResults
+    .map((entry, index) => {
+      const front = entry.card.frontLines.join(" / ");
+      const back = entry.card.backLines.join(" / ");
+      return `
+        <div class="review-item ${entry.result}">
+          <strong>${index + 1}. ${escapeHtml(front)}</strong>
+          <span>${escapeHtml(back)}</span>
+          <em>${entry.result === "correct" ? "Correct" : "Wrong"}</em>
+        </div>
+      `;
+    })
+    .join("");
+
+  elements.reviewSummary.hidden = false;
+  elements.reviewSummary.innerHTML = `
+    <div class="review-summary-head">
+      <strong>${state.scores.flashcardCorrect} correct</strong>
+      <strong>${state.scores.flashcardWrong} wrong</strong>
+      <strong>${Math.max(0, state.totalPairs - state.reviewResults.length)} remaining</strong>
+    </div>
+    <div class="review-summary-list">${items}</div>
+  `;
+}
+
+function showReviewFinished() {
+  elements.board.innerHTML = "";
+  elements.reviewSummary.hidden = false;
+  elements.reviewSummary.innerHTML = `
+    <div class="review-finished">
+      <h3>Review complete</h3>
+      <p>${state.scores.flashcardCorrect} correct, ${state.scores.flashcardWrong} wrong.</p>
+    </div>
+    <div class="review-summary-list">
+      ${state.reviewResults
+        .map((entry, index) => `
+          <div class="review-item ${entry.result}">
+            <strong>${index + 1}. ${escapeHtml(entry.card.frontLines.join(" / "))}</strong>
+            <span>${escapeHtml(entry.card.backLines.join(" / "))}</span>
+            <em>${entry.result === "correct" ? "Correct" : "Wrong"}</em>
+          </div>
+        `)
+        .join("")}
+    </div>
+  `;
+  showStatus(`Flashcard review finished: ${state.scores.flashcardCorrect} correct, ${state.scores.flashcardWrong} wrong.`, "success");
 }
 
 function updateBoardCoordinates() {
@@ -879,19 +1123,7 @@ function getCurrentPlayer() {
 
 function advancePlayer() {
   if (state.players.length < 2) return;
-
-  for (let step = 1; step <= state.players.length; step += 1) {
-    const nextIndex = (state.currentPlayerIndex + step) % state.players.length;
-    const nextPlayer = state.players[nextIndex];
-    const hasOpenCard = state.deck.some(
-      (card) => card.playerId === nextPlayer.id && !card.matched,
-    );
-
-    if (hasOpenCard) {
-      state.currentPlayerIndex = nextIndex;
-      return;
-    }
-  }
+  state.currentPlayerIndex = (state.currentPlayerIndex + 1) % state.players.length;
 }
 
 function showStatus(message, type = "") {
