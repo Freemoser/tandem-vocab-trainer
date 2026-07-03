@@ -1,0 +1,222 @@
+[
+  {
+    "id": "available",
+    "type": "word",
+    "category": "adjectives",
+    "emoji": "✅",
+    "de": "verfügbar / frei",
+    "en": "available",
+    "thai": "ว่าง",
+    "thai_romanized": "wâang",
+    "difficulty": 1
+  },
+  {
+    "id": "run_personal_errands",
+    "type": "phrase",
+    "category": "phrases",
+    "emoji": "🛍️",
+    "de": "private Dinge erledigen",
+    "en": "run personal errands",
+    "thai": "ทำธุระส่วนตัว",
+    "thai_romanized": "tham tú-rá sùuan-dtuaa",
+    "difficulty": 2
+  },
+  {
+    "id": "errand",
+    "type": "word",
+    "category": "nouns",
+    "emoji": "📋",
+    "de": "Erledigung / Besorgung",
+    "en": "errand",
+    "thai": "ธุระ",
+    "thai_romanized": "tú-rá",
+    "difficulty": 1
+  },
+  {
+    "id": "private_personal",
+    "type": "word",
+    "category": "adjectives",
+    "emoji": "🔒",
+    "de": "privat / persönlich",
+    "en": "private / personal",
+    "thai": "ส่วนตัว",
+    "thai_romanized": "sùuan-dtuaa",
+    "difficulty": 1
+  },
+  {
+    "id": "correct",
+    "type": "word",
+    "category": "adjectives",
+    "emoji": "✔️",
+    "de": "korrekt / richtig",
+    "en": "correct",
+    "thai": "ถูก",
+    "thai_romanized": "tòok",
+    "difficulty": 1
+  },
+  {
+    "id": "become_stronger",
+    "type": "phrase",
+    "category": "phrases",
+    "emoji": "💪",
+    "de": "stärker werden",
+    "en": "become stronger",
+    "thai": "แข็งแรงขึ้น",
+    "thai_romanized": "kǎeng raeng kêun",
+    "difficulty": 2
+  },
+  {
+    "id": "more_and_more",
+    "type": "phrase",
+    "category": "phrases",
+    "emoji": "📈",
+    "de": "immer mehr werden",
+    "en": "become more and more",
+    "thai": "ขึ้นเรื่อย ๆ",
+    "thai_romanized": "kêun rêuuay rêuuay",
+    "difficulty": 2
+  },
+  {
+    "id": "get_tired",
+    "type": "phrase",
+    "category": "phrases",
+    "emoji": "🥱",
+    "de": "müde werden",
+    "en": "get tired",
+    "thai": "เริ่มเหนื่อย",
+    "thai_romanized": "rêerm nùueay",
+    "difficulty": 2
+  },
+  {
+    "id": "get_better",
+    "type": "phrase",
+    "category": "phrases",
+    "emoji": "📈",
+    "de": "besser werden",
+    "en": "get better",
+    "thai": "ดีขึ้น",
+    "thai_romanized": "dee kêun",
+    "difficulty": 1
+  },
+  {
+    "id": "better_than",
+    "type": "phrase",
+    "category": "phrases",
+    "emoji": "🏆",
+    "de": "besser als",
+    "en": "better than",
+    "thai": "ดีกว่า",
+    "thai_romanized": "dee gwàa",
+    "difficulty": 1
+  },
+  {
+    "id": "pay_attention",
+    "type": "phrase",
+    "category": "phrases",
+    "emoji": "👀",
+    "de": "darauf achten / sich kümmern",
+    "en": "pay attention to",
+    "thai": "ใส่ใจ",
+    "thai_romanized": "sài jai",
+    "difficulty": 2
+  },
+  {
+    "id": "interested_in",
+    "type": "phrase",
+    "category": "phrases",
+    "emoji": "✨",
+    "de": "sich interessieren",
+    "en": "be interested in",
+    "thai": "สนใจ",
+    "thai_romanized": "sŏn jai",
+    "difficulty": 1
+  },
+  {
+    "id": "future",
+    "type": "word",
+    "category": "nouns",
+    "emoji": "🔮",
+    "de": "Zukunft",
+    "en": "future",
+    "thai": "อนาคต",
+    "thai_romanized": "a-naa-khót",
+    "difficulty": 2
+  },
+  {
+    "id": "strong_physical",
+    "type": "word",
+    "category": "adjectives",
+    "emoji": "💪",
+    "de": "stark / kräftig",
+    "en": "strong / physically strong",
+    "thai": "แข็งแรง",
+    "thai_romanized": "kǎeng raeng",
+    "difficulty": 1
+  },
+  {
+    "id": "strong_intense",
+    "type": "word",
+    "category": "adjectives",
+    "emoji": "🔥",
+    "de": "stark / intensiv",
+    "en": "strong / intense",
+    "thai": "แรง",
+    "thai_romanized": "raeng",
+    "difficulty": 1
+  },
+  {
+    "id": "repair",
+    "type": "word",
+    "category": "verbs",
+    "emoji": "🛠️",
+    "de": "reparieren",
+    "en": "repair / fix",
+    "thai": "ซ่อม",
+    "thai_romanized": "sôm",
+    "difficulty": 1
+  },
+  {
+    "id": "solve",
+    "type": "word",
+    "category": "verbs",
+    "emoji": "🧩",
+    "de": "lösen / Problem lösen",
+    "en": "solve",
+    "thai": "แก้",
+    "thai_romanized": "gâe",
+    "difficulty": 1
+  },
+  {
+    "id": "fall",
+    "type": "word",
+    "category": "verbs",
+    "emoji": "⬇️",
+    "de": "fallen",
+    "en": "fall",
+    "thai": "ตก",
+    "thai_romanized": "dtòk",
+    "difficulty": 1
+  },
+  {
+    "id": "pillow",
+    "type": "word",
+    "category": "nouns",
+    "emoji": "🛏️",
+    "de": "Kissen",
+    "en": "pillow",
+    "thai": "หมอน",
+    "thai_romanized": "mǎwn",
+    "difficulty": 1
+  },
+  {
+    "id": "otherwise",
+    "type": "word",
+    "category": "phrases",
+    "emoji": "🔁",
+    "de": "sonst / andernfalls",
+    "en": "otherwise",
+    "thai": "ไม่งั้น",
+    "thai_romanized": "mâi ngán",
+    "difficulty": 2
+  }
+]

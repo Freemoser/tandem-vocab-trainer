@@ -1,0 +1,112 @@
+[
+  {
+    "id": "search_doctor",
+    "type": "phrase",
+    "category": "phrases",
+    "emoji": "🩺",
+    "de": "Einen Arzt suchen",
+    "en": "Search for a doctor",
+    "thai": "หาหมอ",
+    "thai_romanized": "hǎa mɔ̌ɔ",
+    "difficulty": 2
+  },
+  {
+    "id": "physiotherapist",
+    "type": "word",
+    "category": "nouns",
+    "emoji": "🧑‍⚕️",
+    "de": "Physiotherapeut",
+    "en": "Physiotherapist",
+    "thai": "นักกายภาพบำบัด",
+    "thai_romanized": "nák gaai-yá-phâap bam-bàt",
+    "difficulty": 3
+  },
+  {
+    "id": "not_open_yet",
+    "type": "phrase",
+    "category": "phrases",
+    "emoji": "🚪",
+    "de": "Aber sie haben noch nicht geöffnet.",
+    "en": "But they are not open yet.",
+    "thai": "แต่เขายังไม่เปิด",
+    "thai_romanized": "dtàe khǎo yang mâi bpə̀ət",
+    "difficulty": 2
+  },
+  {
+    "id": "green_curry",
+    "type": "phrase",
+    "category": "phrases",
+    "emoji": "🍛",
+    "de": "Grünes Curry",
+    "en": "Green curry",
+    "thai": "แกงเขียวหวาน",
+    "thai_romanized": "gaeng khǐao-wǎan",
+    "difficulty": 2
+  },
+  {
+    "id": "first_time",
+    "type": "phrase",
+    "category": "phrases",
+    "emoji": "1️⃣",
+    "de": "Das erste Mal",
+    "en": "First time",
+    "thai": "ครั้งแรก",
+    "thai_romanized": "khráng râek",
+    "difficulty": 1
+  },
+  {
+    "id": "pay_separately",
+    "type": "phrase",
+    "category": "phrases",
+    "emoji": "🧾",
+    "de": "Getrennt zahlen",
+    "en": "Pay separately",
+    "thai": "จ่ายแยกกัน",
+    "thai_romanized": "jàai yâek gan",
+    "difficulty": 2
+  },
+  {
+    "id": "pay_together",
+    "type": "phrase",
+    "category": "phrases",
+    "emoji": "💳",
+    "de": "Zusammen zahlen",
+    "en": "Pay together",
+    "thai": "จ่ายด้วยกัน",
+    "thai_romanized": "jàai dûuay gan",
+    "difficulty": 2
+  },
+  {
+    "id": "all_day",
+    "type": "phrase",
+    "category": "phrases",
+    "emoji": "🌞",
+    "de": "Den ganzen Tag?",
+    "en": "All day?",
+    "thai": "ทั้งวันเหรอ",
+    "thai_romanized": "tháng wan rɔ̌r?",
+    "difficulty": 2
+  },
+  {
+    "id": "busy_all_day",
+    "type": "phrase",
+    "category": "phrases",
+    "emoji": "😵‍💫",
+    "de": "Den ganzen Tag beschäftigt?",
+    "en": "Busy all day?",
+    "thai": "ยุ่งทั้งวันเหรอ",
+    "thai_romanized": "yûng tháng wan rɔ̌r?",
+    "difficulty": 2
+  },
+  {
+    "id": "personal_errands",
+    "type": "phrase",
+    "category": "phrases",
+    "emoji": "🛍️",
+    "de": "Private Dinge erledigen",
+    "en": "Run personal errands",
+    "thai": "ทำธุระส่วนตัว",
+    "thai_romanized": "tham thú-rá sùuan-dtuaa",
+    "difficulty": 2
+  }
+]

@@ -20,6 +20,12 @@
               "label": "01.07.2026",
               "file": "lessons/thai-class/aom/2026-07-01.json",
               "count": 10
+            },
+            {
+              "id": "2026-07-02",
+              "label": "02.07.2026",
+              "file": "lessons/thai-class/aom/2026-07-02.json",
+              "count": 10
             }
           ]
         },
@@ -32,6 +38,12 @@
               "label": "01.07.2027",
               "file": "lessons/thai-class/joomy/2027-07-01.json",
               "count": 13
+            },
+            {
+              "id": "2026-07-02",
+              "label": "02.07.2026",
+              "file": "lessons/thai-class/joomy/2026-07-02.json",
+              "count": 20
             }
           ]
         }
