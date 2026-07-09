@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Thai Learning Memory</title>
-    <link rel="stylesheet" href="style.css?v=7" />
+    <link rel="stylesheet" href="style.css?v=9" />
   </head>
   <body>
     <div class="app-shell">
@@ -13,9 +13,15 @@
           <p class="eyebrow">Language Learning Memory</p>
           <h1>Thai Memory Match</h1>
         </div>
-        <button id="restartButton" class="ghost-button" type="button" hidden>
-          New Game
-        </button>
+        <nav class="app-menu" aria-label="Primary">
+          <button id="startMenuButton" class="menu-button" type="button">Start</button>
+          <button id="searchMenuButton" class="menu-button" type="button">Search</button>
+          <button id="impressumMenuButton" class="menu-button" type="button">Impressum</button>
+          <button id="privacyMenuButton" class="menu-button" type="button">Datenschutz</button>
+          <button id="restartButton" class="menu-button menu-button-accent" type="button" hidden>
+            New Game
+          </button>
+        </nav>
       </header>
 
       <main>
@@ -127,6 +133,57 @@
           <div id="board" class="memory-board" aria-live="polite"></div>
           <div id="reviewSummary" class="review-summary" hidden></div>
         </section>
+
+        <section id="searchScreen" class="info-screen" aria-labelledby="searchTitle" hidden>
+          <div class="info-panel">
+            <div class="setup-title">
+              <p class="eyebrow">Lesson lookup</p>
+              <h2 id="searchTitle">Search a word</h2>
+            </div>
+            <form id="searchForm" class="search-form">
+              <label class="sr-only" for="searchInput">Search term</label>
+              <input
+                id="searchInput"
+                name="searchInput"
+                type="text"
+                placeholder="Type Thai, romanized, English, or German"
+                aria-label="Search term"
+                autocomplete="off"
+              />
+              <button class="primary-button" type="submit">Find</button>
+            </form>
+            <p class="helper-copy">
+              We search across all lessons and tell you which teacher and file contain the word.
+            </p>
+            <div id="searchResults" class="search-results" aria-live="polite"></div>
+          </div>
+        </section>
+
+        <section id="impressumScreen" class="info-screen" aria-labelledby="impressumTitle" hidden>
+          <div class="info-panel">
+            <div class="setup-title">
+              <p class="eyebrow">Impressum</p>
+              <h2 id="impressumTitle">Impressum</h2>
+            </div>
+            <p class="info-copy">
+              Placeholder. Add your legal imprint details here when you are ready to publish this
+              publicly.
+            </p>
+          </div>
+        </section>
+
+        <section id="privacyScreen" class="info-screen" aria-labelledby="privacyTitle" hidden>
+          <div class="info-panel">
+            <div class="setup-title">
+              <p class="eyebrow">Datenschutz</p>
+              <h2 id="privacyTitle">Datenschutz</h2>
+            </div>
+            <p class="info-copy">
+              Placeholder. Add your privacy notice here. The app currently runs locally and does
+              not store user accounts or progress.
+            </p>
+          </div>
+        </section>
       </main>
     </div>
 
@@ -144,6 +201,6 @@
       </div>
     </div>
 
-    <script src="app.js?v=7"></script>
+    <script src="app.js?v=9"></script>
   </body>
 </html>

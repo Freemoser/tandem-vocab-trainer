@@ -1,0 +1,134 @@
+[
+  {
+    "id": "argue_fight",
+    "type": "word",
+    "category": "verbs",
+    "emoji": "🗣️",
+    "de": "streiten",
+    "en": "argue / fight (verbally)",
+    "thai": "ทะเลาะ",
+    "thai_romanized": "tá-lór",
+    "difficulty": 2
+  },
+  {
+    "id": "stomach_ache",
+    "type": "word",
+    "category": "phrases",
+    "emoji": "🤢",
+    "de": "Bauchschmerzen",
+    "en": "belly pain / stomach ache",
+    "thai": "ปวดท้อง",
+    "thai_romanized": "bpùat tóng",
+    "difficulty": 2
+  },
+  {
+    "id": "what_is_the_difference",
+    "type": "phrase",
+    "category": "phrases",
+    "emoji": "❓",
+    "de": "Was ist der Unterschied?",
+    "en": "What is the difference?",
+    "thai": "ต่างกันยังไง?",
+    "thai_romanized": "dtàang gan yang ngai?",
+    "difficulty": 2
+  },
+  {
+    "id": "sweat",
+    "type": "word",
+    "category": "verbs",
+    "emoji": "💦",
+    "de": "schwitzen",
+    "en": "sweat",
+    "thai": "เหงื่อออก",
+    "thai_romanized": "ngùuea àawk",
+    "difficulty": 2
+  },
+  {
+    "id": "agree",
+    "type": "word",
+    "category": "verbs",
+    "emoji": "🤝",
+    "de": "zustimmen",
+    "en": "agree",
+    "thai": "เห็นด้วย",
+    "thai_romanized": "hĕn dûuay",
+    "difficulty": 1
+  },
+  {
+    "id": "bet_wager",
+    "type": "word",
+    "category": "verbs",
+    "emoji": "🎲",
+    "de": "Wette / wetten",
+    "en": "bet / wager",
+    "thai": "พนัน",
+    "thai_romanized": "phá-nan",
+    "difficulty": 2
+  },
+  {
+    "id": "mosquito_bite_me",
+    "type": "phrase",
+    "category": "phrases",
+    "emoji": "🦟",
+    "de": "Ich wurde von einer Mücke gebissen.",
+    "en": "I was bitten by a mosquito.",
+    "thai": "ผมโดนยุงกัด",
+    "thai_romanized": "phŏm doon yûng gàt",
+    "difficulty": 2
+  },
+  {
+    "id": "mosquito",
+    "type": "word",
+    "category": "nouns",
+    "emoji": "🦟",
+    "de": "Mücke",
+    "en": "mosquito",
+    "thai": "ยุง",
+    "thai_romanized": "yûng",
+    "difficulty": 1
+  },
+  {
+    "id": "who_will_win",
+    "type": "phrase",
+    "category": "phrases",
+    "emoji": "🏆",
+    "de": "Wer glaubst du wird gewinnen?",
+    "en": "Who do you think will win?",
+    "thai": "คุณคิดว่าใครจะชนะ?",
+    "thai_romanized": "khun khít wâa krai jà chá-ná?",
+    "difficulty": 3
+  },
+  {
+    "id": "lose",
+    "type": "word",
+    "category": "verbs",
+    "emoji": "📉",
+    "de": "verlieren",
+    "en": "lose",
+    "thai": "แพ้",
+    "thai_romanized": "pháe",
+    "difficulty": 1
+  },
+  {
+    "id": "strong_healthy",
+    "type": "word",
+    "category": "adjectives",
+    "emoji": "💪",
+    "de": "stark / kräftig / gesund",
+    "en": "strong",
+    "thai": "แข็งแรง",
+    "thai_romanized": "khǎeng raeng",
+    "difficulty": 1
+  },
+  {
+    "id": "weak",
+    "type": "word",
+    "category": "adjectives",
+    "emoji": "🪫",
+    "de": "schwach",
+    "en": "weak",
+    "thai": "อ่อนแอ",
+    "thai_romanized": "àawn ae",
+    "difficulty": 1
+  }
+]

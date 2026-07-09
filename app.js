@@ -2,8 +2,18 @@ const elements = {
   setupForm: document.querySelector("#setupForm"),
   startButton: document.querySelector("#startButton"),
   restartButton: document.querySelector("#restartButton"),
+  startMenuButton: document.querySelector("#startMenuButton"),
+  searchMenuButton: document.querySelector("#searchMenuButton"),
+  impressumMenuButton: document.querySelector("#impressumMenuButton"),
+  privacyMenuButton: document.querySelector("#privacyMenuButton"),
   startScreen: document.querySelector("#startScreen"),
   gameScreen: document.querySelector("#gameScreen"),
+  searchScreen: document.querySelector("#searchScreen"),
+  searchForm: document.querySelector("#searchForm"),
+  searchInput: document.querySelector("#searchInput"),
+  searchResults: document.querySelector("#searchResults"),
+  impressumScreen: document.querySelector("#impressumScreen"),
+  privacyScreen: document.querySelector("#privacyScreen"),
   memoryOptions: document.querySelector("#memoryOptions"),
   tandemOptions: document.querySelector("#tandemOptions"),
   lessonOptions: document.querySelector("#lessonOptions"),
@@ -29,9 +39,12 @@ const elements = {
 
 const state = {
   curriculum: null,
+  lessonEntries: [],
   lessonCache: new Map(),
+  searchIndexReady: false,
   vocabulary: [],
   config: null,
+  currentView: "start",
   deck: [],
   selectedCards: [],
   pendingMatch: null,
@@ -72,8 +85,10 @@ async function init() {
 
     const curriculum = await response.json();
     state.curriculum = validateCurriculum(curriculum);
+    state.lessonEntries = buildLessonEntries(state.curriculum);
     renderLessonTree(state.curriculum);
     updateModeOptions();
+    setActiveView("start");
     elements.startButton.disabled = false;
     elements.startButton.textContent = "Start Game";
     hideStatus();
@@ -88,6 +103,11 @@ async function init() {
 }
 
 function wireEvents() {
+  elements.startMenuButton.addEventListener("click", () => setActiveView("start"));
+  elements.searchMenuButton.addEventListener("click", () => setActiveView("search"));
+  elements.impressumMenuButton.addEventListener("click", () => setActiveView("impressum"));
+  elements.privacyMenuButton.addEventListener("click", () => setActiveView("privacy"));
+
   document.querySelectorAll('input[name="playMode"]').forEach((input) => {
     input.addEventListener("change", updateModeOptions);
   });
@@ -105,11 +125,20 @@ function wireEvents() {
 
   elements.restartButton.addEventListener("click", () => {
     resetBoardState();
-    elements.startScreen.hidden = false;
-    elements.gameScreen.hidden = true;
-    elements.restartButton.hidden = true;
     hideCheckPanel();
     hideStatus();
+    setActiveView("start");
+  });
+
+  elements.searchForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    void searchLessons().catch((error) => {
+      showSearchResults(
+        [],
+        "Search failed. Please run the app through a local server: python3 -m http.server",
+      );
+      console.error(error);
+    });
   });
 
   elements.board.addEventListener("click", (event) => {
@@ -176,6 +205,26 @@ function validateCurriculum(curriculum) {
   });
 
   return curriculum;
+}
+
+function buildLessonEntries(curriculum) {
+  const entries = [];
+
+  curriculum.courses.forEach((course) => {
+    course.teachers.forEach((teacher) => {
+      teacher.lessons.forEach((lesson) => {
+        entries.push({
+          courseLabel: course.label,
+          teacherLabel: teacher.label,
+          lessonLabel: lesson.label,
+          file: lesson.file,
+          count: lesson.count,
+        });
+      });
+    });
+  });
+
+  return entries;
 }
 
 function renderLessonTree(curriculum) {
@@ -251,6 +300,15 @@ async function loadLessonFile(file) {
   return lessonItems;
 }
 
+async function ensureSearchIndex() {
+  if (state.searchIndexReady) {
+    return;
+  }
+
+  await Promise.all(state.lessonEntries.map((entry) => loadLessonFile(entry.file)));
+  state.searchIndexReady = true;
+}
+
 function updateModeOptions() {
   const mode = document.querySelector('input[name="playMode"]:checked').value;
   const showMemory = mode === "memory";
@@ -258,6 +316,134 @@ function updateModeOptions() {
   elements.memoryOptions.hidden = !showMemory;
   elements.tandemOptions.hidden = !showTandem;
   elements.lessonOptions.hidden = !state.curriculum;
+}
+
+function setActiveView(view) {
+  state.currentView = view;
+
+  const isStart = view === "start";
+  const isGame = view === "game";
+  const isSearch = view === "search";
+  const isImpressum = view === "impressum";
+  const isPrivacy = view === "privacy";
+
+  elements.startScreen.hidden = !isStart;
+  elements.gameScreen.hidden = !isGame;
+  elements.searchScreen.hidden = !isSearch;
+  elements.impressumScreen.hidden = !isImpressum;
+  elements.privacyScreen.hidden = !isPrivacy;
+  elements.restartButton.hidden = !isGame;
+
+  document.querySelectorAll(".menu-button").forEach((button) => {
+    button.classList.remove("is-active");
+  });
+
+  const activeButton =
+    view === "start"
+      ? elements.startMenuButton
+      : view === "search"
+        ? elements.searchMenuButton
+        : view === "impressum"
+          ? elements.impressumMenuButton
+          : view === "privacy"
+            ? elements.privacyMenuButton
+            : null;
+
+  if (activeButton) {
+    activeButton.classList.add("is-active");
+  }
+}
+
+function normalizeSearchText(value) {
+  return String(value)
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[ɔ]/g, "o")
+    .replace(/[ə]/g, "e")
+    .replace(/[ʉ]/g, "u")
+    .replace(/[ŋ]/g, "ng")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+}
+
+async function searchLessons() {
+  const query = elements.searchInput.value.trim();
+
+  if (!query) {
+    showSearchResults([], "Type a word or phrase first.");
+    return;
+  }
+
+  await ensureSearchIndex();
+
+  const normalizedQuery = normalizeSearchText(query);
+  const results = [];
+
+  for (const entry of state.lessonEntries) {
+    const words = state.lessonCache.get(entry.file) || [];
+
+    words.forEach((concept) => {
+      const haystack = [
+        concept.de,
+        concept.en,
+        concept.thai,
+        concept.thai_romanized,
+        concept.id,
+      ]
+        .map(normalizeSearchText)
+        .join(" ");
+
+      if (haystack.includes(normalizedQuery)) {
+        results.push({ entry, concept });
+      }
+    });
+  }
+
+  showSearchResults(results, query);
+}
+
+function showSearchResults(results, query) {
+  if (!query) {
+    elements.searchResults.innerHTML = "";
+    return;
+  }
+
+  if (!results.length) {
+    elements.searchResults.innerHTML = `
+      <div class="search-empty">
+        <strong>No lesson found</strong>
+        <p>Search term: ${escapeHtml(query)}</p>
+      </div>
+    `;
+    return;
+  }
+
+  elements.searchResults.innerHTML = `
+    <div class="search-meta">
+      <strong>${results.length} match${results.length === 1 ? "" : "es"}</strong>
+      <span>Search term: ${escapeHtml(query)}</span>
+    </div>
+    <div class="search-result-list">
+      ${results
+        .map(({ entry, concept }) => {
+          const fileName = entry.file.split("/").pop();
+          return `
+            <article class="search-result">
+              <div class="search-result-head">
+                <strong>${escapeHtml(concept.en)}</strong>
+                <span>${escapeHtml(entry.teacherLabel)} · ${escapeHtml(fileName)}</span>
+              </div>
+              <div class="search-result-body">
+                <span>${escapeHtml(concept.de)}</span>
+                <span>${escapeHtml(concept.thai)} · ${escapeHtml(concept.thai_romanized)}</span>
+              </div>
+            </article>
+          `;
+        })
+        .join("")}
+    </div>
+  `;
 }
 
 async function startGame() {
@@ -296,9 +482,7 @@ async function startGame() {
     state.deck = [];
   }
 
-  elements.startScreen.hidden = true;
-  elements.gameScreen.hidden = false;
-  elements.restartButton.hidden = false;
+  setActiveView("game");
   elements.modeLabel.textContent = getModeLabel(state.config);
   elements.deckLabel.textContent = getDeckLabel(state.config, concepts.length);
 

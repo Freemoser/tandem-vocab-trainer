@@ -26,6 +26,12 @@
               "label": "02.07.2026",
               "file": "lessons/thai-class/aom/2026-07-02.json",
               "count": 10
+            },
+            {
+              "id": "2026-07-09",
+              "label": "09.07.2026",
+              "file": "lessons/thai-class/aom/2026-07-09.json",
+              "count": 12
             }
           ]
         },
