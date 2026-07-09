@@ -1,3 +1,5 @@
+const DATA_VERSION = "2026-07-09-2";
+
 const elements = {
   setupForm: document.querySelector("#setupForm"),
   startButton: document.querySelector("#startButton"),
@@ -77,7 +79,7 @@ async function init() {
 
   // Fetch keeps the lesson catalog local while still matching browser rules.
   try {
-    const response = await fetch("curriculum.json");
+    const response = await fetch(withDataVersion("curriculum.json"), { cache: "no-store" });
 
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`);
@@ -290,7 +292,7 @@ async function loadLessonFile(file) {
     return state.lessonCache.get(file);
   }
 
-  const response = await fetch(file);
+  const response = await fetch(withDataVersion(file), { cache: "no-store" });
   if (!response.ok) {
     throw new Error(`HTTP ${response.status} for ${file}`);
   }
@@ -298,6 +300,11 @@ async function loadLessonFile(file) {
   const lessonItems = validateVocabulary(await response.json());
   state.lessonCache.set(file, lessonItems);
   return lessonItems;
+}
+
+function withDataVersion(file) {
+  const separator = file.includes("?") ? "&" : "?";
+  return `${file}${separator}v=${encodeURIComponent(DATA_VERSION)}`;
 }
 
 async function ensureSearchIndex() {
